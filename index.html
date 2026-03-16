@@ -1,304 +1,351 @@
-> thilllan:
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добыча ресурсов: Ольга Михайловна ждет</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ремесленник: Ольга Михайловна</title>
     <style>
-        :root {
-            --bg-color: #f0f4f8;
-            --primary-stone: #7f8c8d;
-            --primary-wood: #a45a52;
-            --accent: #27ae60;
-        }
-
+        /* Стиль Хамстера / Современный Dark UI */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #2e3b4e 0%, #1a222c 100%);
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
+            padding: 15px;
             user-select: none;
         }
 
         .header {
-            text-align: center;
-            background: white;
-            padding: 15px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
             margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
+        .currency-display {
+            font-size: 42px;
+            font-weight: 800;
+            color: #f1c40f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Сетка ресурсов */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: white;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
             padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            border-bottom: 4px solid #ddd;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
         }
 
+        .stat-label { font-size: 11px; color: #88929b; text-transform: uppercase; }
+        .stat-value { font-size: 18px; font-weight: bold; }
+
+        /* Кнопки-тапалки */
         .clicker-container {
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 15px;
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 20px;
         }
 
-        .tap-button {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            color: white;
-            font-size: 16px;
-            transition: transform 0.1s, box-shadow 0.2s;
+        .tap-area {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 0 #333;
+            gap: 8px;
         }
 
-        .tap-button:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #333;
-        }
-
-        .btn-stone { background-color: var(--primary-stone); box-shadow: 0 6px 0 #5d6d6e; }
-        .btn-wood { background-color: var(--primary-wood); box-shadow: 0 6px 0 #7e3e37; }
-
-        .craft-panel, .olga-panel {
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
+        .main-btn {
             width: 100%;
-            max-width: 500px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        .npc-img {
-            float: left;
-            width: 80px;
-            height: 80px;
-            background: #eee;
+            aspect-ratio: 1/1;
             border-radius: 50%;
-            margin-right: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 40px;
+            transition: transform 0.05s;
+            box-shadow: 0 8px 0 #111;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            border: 3px solid #f1c40f;
         }
 
-        button.action-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 5px;
+        .main-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #111; }
+
+        .btn-stone { background: linear-gradient(#95a5a6, #7f8c8d); }
+        .btn-wood { background: linear-gradient(#e67e22, #d35400); }
+
+        .progress-bg {
             width: 100%;
+            height: 8px;
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
+        .progress-fill {
+            height: 100%;
+            background: #2ecc71;
+            width: 100%;
+            transition: width 0.2s;
         }
 
-        .limit-info {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
+        /* Панели */
+        .panel {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
+
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
+
+        /* Ольга Михайловна CSS */
+        .olga-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(241, 196, 15, 0.1);
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .olga-avatar {
+            width: 60px; height: 60px;
+            background: #f3d0b0;
+            border-radius: 50%;
+            position: relative;
+            border: 2px solid #b08d00;
+            flex-shrink: 0;
+        }
+
+        .olga-glasses {
+            position: absolute;
+            top: 25px; left: 10px;
+            width: 40px; height: 10px;
+            border-top: 2px solid #333;
+            display: flex; justify-content: space-around;
+        }
+
+        .lens { width: 15px; height: 12px; border: 1.5px solid #333; border-radius: 50%; background: white; opacity: 0.5; }
 
         .toast {
             position: fixed;
             bottom: 20px;
-            background: #333;
-            color: white;
+            background: rgba(0,0,0,0.9);
             padding: 10px 20px;
             border-radius: 20px;
             display: none;
-            animation: fadeIn 0.3s;
         }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>Ремесленник</h2>
-        <div id="total-valute">Валюта: 0 🪙</div>
+        <p>ВАЛЮТА</p>
+        <div class="currency-display">🪙 <span id="ui-currency">0</span></div>
     </div>
 
-> thilllan:
-<div class="stats-grid">
-        <div class="stat-card">🪨 Камень: <span id="stone-count">0</span></div>
-        <div class="stat-card">🪵 Дерево: <span id="wood-count">0</span></div>
-        <div class="stat-card">⛓️ Железо: <span id="iron-count">0</span></div>
-        <div class="stat-card">🪵 Бруски: <span id="plank-count">0</span></div>
-        <div class="stat-card" style="grid-column: span 2;">⚒️ Лопаты: <span id="shovel-count">0</span></div>
+    <div class="stats-grid">
+        <div class="stat-card"><span class="stat-label">Камень</span><span class="stat-value" id="ui-stone">0</span></div>
+        <div class="stat-card"><span class="stat-label">Дерево</span><span class="stat-value" id="ui-wood">0</span></div>
+        <div class="stat-card"><span class="stat-label">Железо</span><span class="stat-value" id="ui-iron">0</span></div>
+        <div class="stat-card"><span class="stat-label">Бруски</span><span class="stat-value" id="ui-planks">0</span></div>
+        <div class="stat-card" style="grid-column: span 2; align-items: center;">
+            <span class="stat-label">Лопаты</span><span class="stat-value" id="ui-shovels">0</span>
+        </div>
     </div>
 
     <div class="clicker-container">
-        <div>
-            <button class="tap-button btn-stone" onclick="mine('stone')">🪨<br>ДОБЫТЬ</button>
-            <div class="limit-info">Лимит: <span id="stone-limit">100</span>/100</div>
+        <div class="tap-area">
+            <button class="main-btn btn-stone" id="btn-mine-stone">🪨</button>
+            <div class="progress-bg"><div class="progress-fill" id="bar-stone"></div></div>
+            <span id="ui-limit-stone">100/100</span>
         </div>
-        <div>
-            <button class="tap-button btn-wood" onclick="mine('wood')">🪵<br>РУБИТЬ</button>
-            <div class="limit-info">Лимит: <span id="wood-limit">100</span>/100</div>
+        <div class="tap-area">
+            <button class="main-btn btn-wood" id="btn-mine-wood">🪵</button>
+            <div class="progress-bg"><div class="progress-fill" id="bar-wood"></div></div>
+            <span id="ui-limit-wood">100/100</span>
         </div>
     </div>
 
-    <div class="craft-panel">
+    <div class="panel">
         <h3>Верстак</h3>
-        <button class="action-btn" onclick="craft('iron')">Сделать Железо (10 камня)</button>
-        <button class="action-btn" onclick="craft('plank')">Сделать Брусок (10 дерева)</button>
-        <button class="action-btn" onclick="craft('shovel')">Собрать лопату (1 железо + 1 брусок)</button>
+        <button class="action-btn" id="btn-craft-iron">Сделать Железо <span>10 камня</span></button>
+        <button class="action-btn" id="btn-craft-plank">Сделать Брусок <span>10 дерева</span></button>
+        <button class="action-btn" id="btn-craft-shovel">Собрать лопату <span>1ж + 1б</span></button>
     </div>
 
-    <div class="olga-panel">
-        <div class="npc-img">👵</div>
-        <h4>Ольга Михайловна</h4>
-        <p>— Привет, милок! Сдавай лопаты (от 100 шт). Плачу 40 монет за штуку.</p>
-        <button class="action-btn" id="sell-btn" onclick="sellShovels()" style="background: #e67e22;">Сдать 100 лопат</button>
-        <button class="action-btn" onclick="upgradeLimit()" style="background: #9b59b6; margin-top: 10px;">Расширить лимит (+50) за 2000 монет</button>
+    <div class="panel">
+        <div class="olga-box">
+            <div class="olga-avatar">
+                <div style="width:50px; height:20px; background:#7f8c8d; border-radius:25px 25px 0 0; position:absolute; top:-5px; left:5px;"></div>
+                <div class="olga-glasses"><div class="lens"></div><div class="lens"></div></div>
+            </div>
+            <div>
+                <strong style="color:#f1c40f">Ольга Михайловна</strong>
+                <p style="font-size: 12px; color: #ccc;">Сдавай лопаты пачками по 100 штук!</p>
+            </div>
+        </div>
+        <button class="action-btn" id="btn-sell" style="background:#e67e22">Сдать 100 лопат <span>+4000 🪙</span></button>
+        <button class="action-btn" id="btn-upgrade" style="background:#9b59b6">Лимит +50 <span>2000 🪙</span></button>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script>
-        // Состояние игры (загрузка из памяти или дефолт)
-        let state = JSON.parse(localStorage.getItem('gameSave')) || {
-            stone: 0,
-            wood: 0,
-            iron: 0,
-            planks: 0,
-            shovels: 0,
-            currency: 0,
-            stoneLimit: 100,
-            woodLimit: 100,
-            maxLimit: 100,
-            lastReset: Date.now()
-        };
+        // ВСЯ ЛОГИКА ТУТ
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Состояние
+            let state = JSON.parse(localStorage.getItem('craft_game_save')) || {
+                stone: 0, wood: 0, iron: 0, planks: 0, shovels: 0,
+                currency: 0, stoneLimit: 100, woodLimit: 100, maxLimit: 100,
+                lastReset: Date.now()
+            };
 
-        // Обновление лимитов каждый час
-        function checkLimitReset() {
-            const now = Date.now();
-            if (now - state.lastReset > 3600000) { // 1 час в мс
-                state.stoneLimit = state.maxLimit;
-                state.woodLimit = state.maxLimit;
-                state.lastReset = now;
+            // 2. Элементы UI
+            const els = {
+                stone: document.getElementById('ui-stone'),
+                wood: document.getElementById('ui-wood'),
+                iron: document.getElementById('ui-iron'),
+                planks: document.getElementById('ui-planks'),
+                shovels: document.getElementById('ui-shovels'),
+                currency: document.getElementById('ui-currency'),
+                limStone: document.getElementById('ui-limit-stone'),
+                limWood: document.getElementById('ui-limit-wood'),
+                barStone: document.getElementById('bar-stone'),
+                barWood: document.getElementById('bar-wood')
+            };
+
+            // 3. Функции обновления
+            function save() {
+                localStorage.setItem('craft_game_save', JSON.stringify(state));
+                updateUI();
+            }
+
+            function updateUI() {
+                els.stone.innerText = state.stone;
+                els.wood.innerText = state.wood;
+                els.iron.innerText = state.iron;
+                els.planks.innerText = state.planks;
+                els.shovels.innerText = state.shovels;
+                els.currency.innerText = state.currency;
+                
+                els.limStone.innerText = `${state.stoneLimit}/${state.maxLimit}`;
+                els.limWood.innerText = `${state.woodLimit}/${state.maxLimit}`;
+                
+                els.barStone.style.width = (state.stoneLimit / state.maxLimit * 100) + '%';
+                els.barWood.style.width = (state.woodLimit / state.maxLimit * 100) + '%';
+
+                // Блокировка кнопок
+                document.getElementById('btn-craft-iron').disabled = state.stone < 10;
+                document.getElementById('btn-craft-plank').disabled = state.wood < 10;
+                document.getElementById('btn-craft-shovel').disabled = (state.iron < 1 || state.planks < 1);
+                document.getElementById('btn-sell').disabled = state.shovels < 100;
+                document.getElementById('btn-upgrade').disabled = state.currency < 2000;
+            }
+
+            function showToast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.style.display = 'block';
+                setTimeout(() => t.style.display = 'none', 2000);
+            }
+
+            // 4. Обработчики событий (вместо onclick)
+            document.getElementById('btn-mine-stone').addEventListener('click', () => {
+                if (state.stoneLimit > 0) {
+                    state.stone++;
+                    state.stoneLimit--;
+                    save();
+                } else { showToast("Нет лимита!"); }
+            });
+
+            document.getElementById('btn-mine-wood').addEventListener('click', () => {
+                if (state.woodLimit > 0) {
+                    state.wood++;
+                    state.woodLimit--;
+                    save();
+                } else { showToast("Нет лимита!"); }
+            });
+
+            document.getElementById('btn-craft-iron').addEventListener('click', () => {
+                state.stone -= 10; state.iron++; save();
+            });
+
+            document.getElementById('btn-craft-plank').addEventListener('click', () => {
+                state.wood -= 10; state.planks++; save();
+            });
+
+            document.getElementById('btn-craft-shovel').addEventListener('click', () => {
+                state.iron--; state.planks--; state.shovels++; save();
+            });
+
+            document.getElementById('btn-sell').addEventListener('click', () => {
+                state.shovels -= 100; state.currency += 4000; 
+                showToast("Ольга Михайловна приняла товар!");
                 save();
-                showToast("Лимиты обновлены!");
-            }
-        }
+            });
 
-        function mine(type) {
-            checkLimitReset();
-            if (type === 'stone' && state.stoneLimit > 0) {
-                state.stone++;
-                state.stoneLimit--;
-            } else if (type === 'wood' && state.woodLimit > 0) {
-                state.wood++;
-                state.woodLimit--;
-            } else {
-                showToast("Лимит исчерпан! Жди час.");
-                return;
-            }
+            document.getElementById('btn-upgrade').addEventListener('click', () => {
+                state.currency -= 2000; state.maxLimit += 50; 
+                state.stoneLimit += 50; state.woodLimit += 50;
+                save();
+            });
+
+            // Сброс лимита раз в час
+            setInterval(() => {
+                if (Date.now() - state.lastReset > 3600000) {
+                    state.stoneLimit = state.maxLimit;
+                    state.woodLimit = state.maxLimit;
+                    state.lastReset = Date.now();
+                    save();
+                }
+            }, 60000);
+
+            // Стартовый запуск
             updateUI();
-            save();
-        }
-
-        function craft(item) {
-            if (item === 'iron' && state.stone >= 10) {
-                state.stone -= 10;
-                state.iron++;
-            } else if (item === 'plank' && state.wood >= 10) {
-                state.wood -= 10;
-                state.planks++;
-            } else if (item === 'shovel' && state.iron >= 1 && state.planks >= 1) {
-                state.iron--;
-                state.planks--;
-                state.shovels++;
-            } else {
-                showToast("Недостаточно ресурсов!");
-                return;
-            }
-            updateUI();
-            save();
-        }
-
-        function sellShovels() {
-            if (state.shovels >= 100) {
-
-> thilllan:
-state.shovels -= 100;
-                state.currency += (100 * 40);
-                showToast("Ольга Михайловна довольна!");
-            } else {
-                showToast("Нужно минимум 100 лопат!");
-            }
-            updateUI();
-            save();
-        }
-
-        function upgradeLimit() {
-            if (state.currency >= 2000) {
-                state.currency -= 2000;
-                state.maxLimit += 50;
-                state.stoneLimit += 50;
-                state.woodLimit += 50;
-                showToast("Лимит расширен!");
-            } else {
-                showToast("Маловато денег...");
-            }
-            updateUI();
-            save();
-        }
-
-        function save() {
-            localStorage.setItem('gameSave', JSON.stringify(state));
-        }
-
-        function updateUI() {
-            document.getElementById('stone-count').innerText = state.stone;
-            document.getElementById('wood-count').innerText = state.wood;
-            document.getElementById('iron-count').innerText = state.iron;
-            document.getElementById('plank-count').innerText = state.planks;
-            document.getElementById('shovel-count').innerText = state.shovels;
-            document.getElementById('total-valute').innerText = Валюта: ${state.currency} 🪙;
-            document.getElementById('stone-limit').innerText = state.stoneLimit;
-            document.getElementById('wood-limit').innerText = state.woodLimit;
-        }
-
-        function showToast(text) {
-            const t = document.getElementById('toast');
-            t.innerText = text;
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2000);
-        }
-
-        // Инициализация
-        setInterval(checkLimitReset, 60000); // Проверять время каждую минуту
-        updateUI();
+        });
     </script>
 </body>
 </html>
