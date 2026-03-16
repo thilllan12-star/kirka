@@ -1,3 +1,533 @@
+> thilllan:
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ремесленный Кликер: Путь к Ольге Михайловне</title>
+    <style>
+        /* --- Общие стили и Сброс --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Убираем подсветку тапа на iOS */
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #2e3b4e 0%, #1a222c 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* --- SVG Иконки (Спрайт) --- */
+        .svg-icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+
+        /* Define icons */
+        #svg-sprite { display: none; }
+
+        /* --- Шапка (Валюта) --- */
+        .header {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0aab5;
+            margin-bottom: 8px;
+        }
+
+        .currency-display {
+            font-size: 36px;
+            font-weight: 800;
+            color: #f1c40f;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .currency-icon {
+            width: 32px; height: 32px;
+            background: #f1c40f;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            font-weight: bold; color: #b08d00; font-size: 20px;
+        }
+
+        /* --- Сетка ресурсов --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(40, 50, 65, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:active { transform: scale(0.98); }
+
+        .stat-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Цвета для ресурсов */
+        .icon-stone { background: linear-gradient(135deg, #7f8c8d, #95a5a6); color: #2c3e50; }
+        .icon-wood { background: linear-gradient(135deg, #a45a52, #c0392b); color: #fff; }
+        .icon-iron { background: linear-gradient(135deg, #bdc3c7, #ecf0f1); color: #34495e; border: 1px solid #7f8c8d; }
+        .icon-plank { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
+        .icon-shovel { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; grid-column: span 2; justify-content: center;}
+
+> thilllan:
+.stat-info { display: flex; flex-direction: column; }
+        .stat-label { font-size: 12px; color: #a0aab5; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 20px; font-weight: 700; color: #fff; }
+
+        /* --- Зона кликеров --- */
+        .clicker-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 25px;
+        }
+
+        .mine-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 45%;
+        }
+
+        .tap-button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 10px 0 #1a222c, 0 15px 25px rgba(0,0,0,0.5);
+            transition: all 0.1s ease;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;
+        }
+
+        /* Градиенты кнопок */
+        .btn-stone {
+            background: radial-gradient(circle at center, #95a5a6 0%, #7f8c8d 100%);
+            border: 4px solid #bdc3c7;
+        }
+        .btn-stone:active { box-shadow: 0 4px 0 #1a222c, 0 8px 15px rgba(0,0,0,0.4); transform: translateY(6px); }
+
+        .btn-wood {
+            background: radial-gradient(circle at center, #c0392b 0%, #a45a52 100%);
+            border: 4px solid #e74c3c;
+        }
+        .btn-wood:active { box-shadow: 0 4px 0 #1a222c, 0 8px 15px rgba(0,0,0,0.4); transform: translateY(6px); }
+
+        .btn-icon-big { font-size: 40px; margin-bottom: 5px; }
+
+        .limit-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .limit-bar-fill {
+            height: 100%;
+            background: #2ecc71;
+            width: 100%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .limit-text { font-size: 11px; color: #a0aab5; }
+
+        /* --- Панели действий (Верстак и Ольга) --- */
+        .panel {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .panel-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            border-bottom: 4px solid #1f6391;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.1s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .action-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .action-btn:disabled { background: #57606f; border-bottom-color: #2f3542; color: #a0aab5; cursor: not-allowed; opacity: 0.7;}
+
+        .cost-tag {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex; align-items: center; gap: 4px;
+        }
+
+> thilllan:
+/* --- Прорисовка Ольги Михайловны --- */
+        .olga-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(241, 196, 15, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(241, 196, 15, 0.15);
+        }
+
+        .olga-avatar {
+            width: 90px;
+            height: 90px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* Тело (круглая) */
+        .olga-body {
+            width: 100%; height: 100%;
+            background: #f3d0b0; /* Цвет кожи */
+            border-radius: 50%;
+            border: 3px solid #b08d00;
+            box-shadow: inset 0 -5px 10px rgba(176, 141, 0, 0.3);
+            position: absolute;
+        }
+
+        /* Лицо (Круглолицая) */
+        .olga-face {
+            width: 80%; height: 80%;
+            background: #fee5cd;
+            border-radius: 50%;
+            position: absolute; top: 10%; left: 10%;
+        }
+
+        /* Очки */
+        .olga-glasses {
+            width: 70%; height: 25%;
+            position: absolute; top: 35%; left: 15%;
+            display: flex; justify-content: space-between;
+        }
+        .lens {
+            width: 40%; height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid #333;
+            border-radius: 50%;
+        }
+        .bridge {
+            width: 20%; height: 2px; background: #333;
+            position: absolute; top: 50%; left: 40%;
+        }
+
+        /* Глаза */
+        .olga-eyes {
+            width: 60%; height: 10%;
+            position: absolute; top: 42%; left: 20%;
+            display: flex; justify-content: space-between;
+        }
+        .eye { width: 5px; height: 5px; background: #333; border-radius: 50%; }
+
+        /* Волосы (Короткая стрижка) */
+        .olga-hair {
+            width: 90%; height: 40%;
+            background: #7f8c8d; /* Седые */
+            border-radius: 50% 50% 0 0;
+            position: absolute; top: -5%; left: 5%;
+        }
+
+        .olga-talk { flex-grow: 1; }
+        .olga-name { font-weight: 700; color: #f1c40f; margin-bottom: 4px; }
+        .olga-quote { font-size: 13px; color: #a0aab5; font-style: italic; line-height: 1.4; }
+
+        /* --- Уведомление (Toast) --- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+            white-space: nowrap;
+        }
+
+        @keyframes slideUp { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <svg id="svg-sprite">
+        <symbol id="icon-stone-svg" viewBox="0 0 512 512"><path d="M389.2 82.3c-18.4-23.7-52.4-29.3-77.1-13.1L219.7 121c-16 10.5-25.7 28.5-25.7 47.7v162.7l-97.1 57.1c-21.7 12.8-28.9 41-16.1 62.7 12.8 21.7 41 28.9 62.7 16.1L224 419.6V256.9l92.4-53.7c19.1-11.1 30.8-31.5 30.8-53.6V82.3z"/></symbol>
+        <symbol id="icon-wood-svg" viewBox="0 0 512 512"><path d="M410.3 22.1c-15.6-7.8-34.7-1.4-42.5 14.2L280.2 198.6c-7.8 15.6-1.4 34.7 14.2 42.5s34.7 1.4 42.5-14.2l87.6-162.3c7.8-15.6 1.4-34.7-14.2-42.5zM224 96c-17.7 0-32 14.3-32 32v256c0 17.7 14.3 32 32 32h256c17.7 0 32-14.3 32-32V128c0-17.7-14.3-32-32-32H224zm-32 128V128H96v96H64V96c0-17.7 14.3-32 32-32h128c17.7 0 32 14.3 32 32v128h-32z"/></symbol>
+        <symbol id="icon-iron-svg" viewBox="0 0 512 512"><path d="M128 64c0-17.7 14.3-32 32-32h192c17.7 0 32 14.3 32 32v64H128V64zM64 160h384v288H64V160zm160 112c0-13.3-10.7-24-24-24s-24 10.7-24 24 10.7 24 24 24 24-10.7 24-24z"/></symbol>
+
+> thilllan:
+<symbol id="icon-plank-svg" viewBox="0 0 512 512"><path d="M32 96l448 0 0 48-448 0 0-48zm0 112l448 0 0 48-448 0 0-48zm0 112l448 0 0 48-448 0 0-48zm0 112l448 0 0 48-448 0 0-48z"/></symbol>
+        <symbol id="icon-shovel-svg" viewBox="0 0 512 512"><path d="M308.2 3.9c-5.2-5.2-13.6-5.2-18.8 0l-71.1 71.1-13.6 13.6c-5.2 5.2-5.2 13.6 0 18.8L224 126.6l19.1 19.1 13.6 13.6c5.2 5.2 13.6 5.2 18.8 0l13.6-13.6L308.2 127l19.1-19.1c5.2-5.2 5.2-13.6 0-18.8L308.2 3.9zM64.6 447.4c17.7 17.7 46.4 17.7 64.1 0l161.9-161.9L226.7 221.7 64.6 383.3c-17.7 17.7-17.7 46.4 0 64.1z"/></symbol>
+    </svg>
+
+    <div class="header">
+        <h1>Твой Баланс</h1>
+        <div class="currency-display">
+            <div class="currency-icon">M</div>
+            <span id="total-valute">0</span>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-stone"><svg class="svg-icon"><use xlink:href="#icon-stone-svg"></use></svg></div>
+            <div class="stat-info"><span class="stat-label">Камень</span><span class="stat-value" id="stone-count">0</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-wood"><svg class="svg-icon"><use xlink:href="#icon-wood-svg"></use></svg></div>
+            <div class="stat-info"><span class="stat-label">Дерево</span><span class="stat-value" id="wood-count">0</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-iron"><svg class="svg-icon"><use xlink:href="#icon-iron-svg"></use></svg></div>
+            <div class="stat-info"><span class="stat-label">Железо</span><span class="stat-value" id="iron-count">0</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-plank"><svg class="svg-icon"><use xlink:href="#icon-plank-svg"></use></svg></div>
+            <div class="stat-info"><span class="stat-label">Бруски</span><span class="stat-value" id="plank-count">0</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-shovel"><svg class="svg-icon"><use xlink:href="#icon-shovel-svg"></use></svg></div>
+            <div class="stat-info"><span class="stat-label">Лопаты</span><span class="stat-value" id="shovel-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="clicker-container">
+        <div class="mine-wrapper">
+            <button class="tap-button btn-stone" onclick="mine('stone')">
+                <span class="btn-icon-big"><svg class="svg-icon"><use xlink:href="#icon-stone-svg"></use></svg></span>
+                Камень
+            </button>
+            <div class="limit-bar-container"><div class="limit-bar-fill" id="stone-bar"></div></div>
+            <div class="limit-text"><span id="stone-limit">100</span> / <span class="max-limit-text">100</span></div>
+        </div>
+        <div class="mine-wrapper">
+            <button class="tap-button btn-wood" onclick="mine('wood')">
+                <span class="btn-icon-big"><svg class="svg-icon"><use xlink:href="#icon-wood-svg"></use></svg></span>
+                Дерево
+            </button>
+            <div class="limit-bar-container"><div class="limit-bar-fill" id="wood-bar"></div></div>
+            <div class="limit-text"><span id="wood-limit">100</span> / <span class="max-limit-text">100</span></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">⚒️ Верстак</div>
+        <button class="action-btn" id="craft-iron-btn" onclick="craft('iron')">
+            Сделать Железо
+            <div class="cost-tag">10 Камень</div>
+        </button>
+        <button class="action-btn" id="craft-plank-btn" onclick="craft('plank')">
+            Сделать Брусок
+            <div class="cost-tag">10 Дерево</div>
+        </button>
+        <button class="action-btn" id="craft-shovel-btn" onclick="craft('shovel')">
+            Собрать лопату
+            <div class="cost-tag">1 Жел. + 1 Брус.</div>
+        </button>
+    </div>
+
+> thilllan:
+<div class="panel">
+        <div class="panel-header">👵 Прием Лопат</div>
+        <div class="olga-card">
+            <div class="olga-avatar">
+                <div class="olga-hair"></div>
+                <div class="olga-body"></div>
+                <div class="olga-face"></div>
+                <div class="olga-glasses"><div class="lens"></div><div class="bridge"></div><div class="lens"></div></div>
+                <div class="olga-eyes"><div class="eye"></div><div class="eye"></div></div>
+            </div>
+            <div class="olga-talk">
+                <div class="olga-name">Ольга Михайловна</div>
+                <div class="olga-quote">— Привет, милок! Сдавай лопаты (от 100 шт). Плачу 40 монет за штуку.</div>
+            </div>
+        </div>
+        <button class="action-btn" id="sell-btn" onclick="sellShovels()" style="background: linear-gradient(180deg, #e67e22 0%, #d35400 100%); border-bottom-color: #a04000;">
+            Сдать 100 лопат
+            <div class="cost-tag">+4000 Монет</div>
+        </button>
+        <button class="action-btn" id="upgrade-btn" onclick="upgradeLimit()" style="background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); border-bottom-color: #6c3483; margin-top: 10px;">
+            Расширить лимит (+50)
+            <div class="cost-tag">2000 Монет</div>
+        </button>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // --- Логика Игры (без изменений, только UI) ---
+        let state = JSON.parse(localStorage.getItem('gameSave_v2')) || {
+            stone: 0,
+            wood: 0,
+            iron: 0,
+            planks: 0,
+            shovels: 0,
+            currency: 0,
+            stoneLimit: 100,
+            woodLimit: 100,
+            maxLimit: 100,
+            lastReset: Date.now()
+        };
+
+        function checkLimitReset() {
+            const now = Date.now();
+            if (now - state.lastReset > 3600000) {
+                state.stoneLimit = state.maxLimit;
+                state.woodLimit = state.maxLimit;
+                state.lastReset = now;
+                save();
+                showToast("Лимиты обновлены!");
+            }
+        }
+
+        function mine(type) {
+            checkLimitReset();
+            if (type === 'stone' && state.stoneLimit > 0) {
+                state.stone++;
+                state.stoneLimit--;
+            } else if (type === 'wood' && state.woodLimit > 0) {
+                state.wood++;
+                state.woodLimit--;
+            } else {
+                showToast("Лимит исчерпан! Жди час.");
+                return;
+            }
+            updateUI();
+            save();
+        }
+
+        function craft(item) {
+            if (item === 'iron' && state.stone >= 10) {
+                state.stone -= 10;
+                state.iron++;
+            } else if (item === 'plank' && state.wood >= 10) {
+                state.wood -= 10;
+                state.planks++;
+            } else if (item === 'shovel' && state.iron >= 1 && state.planks >= 1) {
+                state.iron--;
+                state.planks--;
+                state.shovels++;
+            } else {
+                showToast("Недостаточно ресурсов!");
+                return;
+            }
+            updateUI();
+            save();
+        }
+
+        function sellShovels() {
+            if (state.shovels >= 100) {
+                state.shovels -= 100;
+                state.currency += (100 * 40);
+                showToast("Ольга Михайловна довольна!");
+            } else {
+                showToast("Нужно минимум 100 лопат!");
+            }
+            updateUI();
+            save();
+        }
+
+        function upgradeLimit() {
+            if (state.currency >= 2000) {
+                state.currency -= 2000;
+                state.maxLimit += 50;
+                state.stoneLimit += 50;
+                state.woodLimit += 50;
+                showToast("Лимит расширен!");
+            } else {
+                showToast("Маловато денег...");
+            }
+            updateUI();
+            save();
+        }
+
+> thilllan:
 function save() {
             localStorage.setItem('gameSave_v2', JSON.stringify(state));
         }
