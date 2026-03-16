@@ -1,0 +1,57 @@
+function save() {
+            localStorage.setItem('gameSave_v2', JSON.stringify(state));
+        }
+
+        function updateUI() {
+            // Ресурсы
+            document.getElementById('stone-count').innerText = state.stone;
+            document.getElementById('wood-count').innerText = state.wood;
+            document.getElementById('iron-count').innerText = state.iron;
+            document.getElementById('plank-count').innerText = state.planks;
+            document.getElementById('shovel-count').innerText = state.shovels;
+            document.getElementById('total-valute').innerText = state.currency;
+
+            // Лимиты и полоски
+            document.getElementById('stone-limit').innerText = state.stoneLimit;
+            document.getElementById('wood-limit').innerText = state.woodLimit;
+            
+            const maxTexts = document.querySelectorAll('.max-limit-text');
+            maxTexts.forEach(el => el.innerText = state.maxLimit);
+
+            const stonePerc = (state.stoneLimit / state.maxLimit) * 100;
+            const woodPerc = (state.woodLimit / state.maxLimit) * 100;
+            document.getElementById('stone-bar').style.width = stonePerc + '%';
+            document.getElementById('wood-bar').style.width = woodPerc + '%';
+
+            // Цвет полосок (краснеет при исчерпании)
+            updateBarColor('stone-bar', stonePerc);
+            updateBarColor('wood-bar', woodPerc);
+
+            // Кнопки (делаем неактивными, если мало ресурсов)
+            document.getElementById('craft-iron-btn').disabled = (state.stone < 10);
+            document.getElementById('craft-plank-btn').disabled = (state.wood < 10);
+            document.getElementById('craft-shovel-btn').disabled = (state.iron < 1 || state.planks < 1);
+            document.getElementById('sell-btn').disabled = (state.shovels < 100);
+            document.getElementById('upgrade-btn').disabled = (state.currency < 2000);
+        }
+
+        function updateBarColor(barId, percentage) {
+            const bar = document.getElementById(barId);
+            if (percentage < 20) bar.style.background = '#e74c3c';
+            else if (percentage < 50) bar.style.background = '#f39c12';
+            else bar.style.background = '#2ecc71';
+        }
+
+        function showToast(text) {
+            const t = document.getElementById('toast');
+            t.innerText = text;
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2000);
+        }
+
+        // Инициализация
+        setInterval(checkLimitReset, 60000);
+        updateUI();
+    </script>
+</body>
+</html>
