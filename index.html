@@ -3,349 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ремесленник: Ольга Михайловна</title>
+    <title>KIRKA: Beta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Стиль Хамстера / Современный Dark UI */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at center, #2e3b4e 0%, #1a222c 100%);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-            user-select: none;
+        :root {
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.8);
+            --kirka-blue: #00d2ff; /* Цвет как на логотипе */
+            --gold: #fbbf24;
+            --error: #ef4444;
         }
 
-        .header {
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: white; min-height: 100vh; display: flex; flex-direction: column; }
 
-        .currency-display {
-            font-size: 42px;
-            font-weight: 800;
-            color: #f1c40f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        /* --- Логотип --- */
+        .logo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; justify-content: center; }
+        .logo-box { width: 60px; height: 60px; background: var(--kirka-blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+        .logo-text { font-weight: 900; font-size: 45px; color: var(--kirka-blue); letter-spacing: -2px; }
 
-        /* Сетка ресурсов */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 480px;
-            margin-bottom: 20px;
-        }
+        /* --- Авторизация --- */
+        .auth-container { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card); padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .auth-input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 16px; }
+        .auth-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--kirka-blue); color: #000; font-weight: 800; cursor: pointer; margin-top: 15px; }
 
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            padding: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-        }
+        /* --- Интерфейс --- */
+        #game-ui { display: none; flex-direction: column; flex: 1; }
+        .header { padding: 15px 20px; background: rgba(15, 23, 42, 0.9); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; }
+        .balance { font-size: 20px; font-weight: 800; color: var(--gold); }
 
-        .stat-label { font-size: 11px; color: #88929b; text-transform: uppercase; }
-        .stat-value { font-size: 18px; font-weight: bold; }
+        .main-content { padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; flex: 1; padding-bottom: 100px; }
+        .page { display: none; animation: slideUp 0.3s ease; }
+        .page.active { display: block; }
 
-        /* Кнопки-тапалки */
-        .clicker-container {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            max-width: 480px;
-            margin-bottom: 20px;
-        }
+        /* Тапалка */
+        .tap-zone { width: 240px; height: 240px; border-radius: 40px; margin: 40px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; cursor: pointer; position: relative; transition: 0.1s; border: 8px solid rgba(255,255,255,0.05); }
+        .tap-zone:active { transform: scale(0.95); }
+        .tap-stone { background: radial-gradient(circle, #475569, #1e293b); box-shadow: 0 0 40px rgba(255,255,255,0.1); }
+        .tap-wood { background: radial-gradient(circle, #b45309, #451a03); box-shadow: 0 0 40px rgba(180, 83, 9, 0.3); }
 
-        .tap-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
+        .progress-bar { width: 100%; height: 12px; background: #334155; border-radius: 6px; margin-top: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--kirka-blue); width: 100%; transition: 0.3s; }
 
-        .main-btn {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-size: 40px;
-            transition: transform 0.05s;
-            box-shadow: 0 8px 0 #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* Навигация */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 11px; cursor: pointer; }
+        .nav-item.active { color: var(--kirka-blue); }
+        .nav-icon { font-size: 24px; margin-bottom: 4px; }
 
-        .main-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #111; }
+        /* Профиль и Футер */
+        .profile-card { background: var(--card); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--kirka-blue); }
+        .footer-info { margin-top: 30px; text-align: center; color: #64748b; font-size: 14px; line-height: 1.6; }
+        .creator-tag { color: var(--kirka-blue); font-weight: bold; text-decoration: none; }
+        .beta-badge { background: #334155; color: var(--kirka-blue); padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; display: inline-block; margin-bottom: 10px; }
 
-        .btn-stone { background: linear-gradient(#95a5a6, #7f8c8d); }
-        .btn-wood { background: linear-gradient(#e67e22, #d35400); }
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .btn-blue { background: var(--kirka-blue); color: #000; }
+        .btn-gold { background: var(--gold); color: #000; }
 
-        .progress-bg {
-            width: 100%;
-            height: 8px;
-            background: #111;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #2ecc71;
-            width: 100%;
-            transition: width 0.2s;
-        }
-
-        /* Панели */
-        .panel {
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            background: #3498db;
-            color: white;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .action-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
-
-        /* Ольга Михайловна CSS */
-        .olga-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(241, 196, 15, 0.1);
-            padding: 10px;
-            border-radius: 15px;
-        }
-
-        .olga-avatar {
-            width: 60px; height: 60px;
-            background: #f3d0b0;
-            border-radius: 50%;
-            position: relative;
-            border: 2px solid #b08d00;
-            flex-shrink: 0;
-        }
-
-        .olga-glasses {
-            position: absolute;
-            top: 25px; left: 10px;
-            width: 40px; height: 10px;
-            border-top: 2px solid #333;
-            display: flex; justify-content: space-around;
-        }
-
-        .lens { width: 15px; height: 12px; border: 1.5px solid #333; border-radius: 50%; background: white; opacity: 0.5; }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            background: rgba(0,0,0,0.9);
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: none;
-        }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <p>ВАЛЮТА</p>
-        <div class="currency-display">🪙 <span id="ui-currency">0</span></div>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card"><span class="stat-label">Камень</span><span class="stat-value" id="ui-stone">0</span></div>
-        <div class="stat-card"><span class="stat-label">Дерево</span><span class="stat-value" id="ui-wood">0</span></div>
-        <div class="stat-card"><span class="stat-label">Железо</span><span class="stat-value" id="ui-iron">0</span></div>
-        <div class="stat-card"><span class="stat-label">Бруски</span><span class="stat-value" id="ui-planks">0</span></div>
-        <div class="stat-card" style="grid-column: span 2; align-items: center;">
-            <span class="stat-label">Лопаты</span><span class="stat-value" id="ui-shovels">0</span>
-        </div>
-    </div>
-
-    <div class="clicker-container">
-        <div class="tap-area">
-            <button class="main-btn btn-stone" id="btn-mine-stone">🪨</button>
-            <div class="progress-bg"><div class="progress-fill" id="bar-stone"></div></div>
-            <span id="ui-limit-stone">100/100</span>
-        </div>
-        <div class="tap-area">
-            <button class="main-btn btn-wood" id="btn-mine-wood">🪵</button>
-            <div class="progress-bg"><div class="progress-fill" id="bar-wood"></div></div>
-            <span id="ui-limit-wood">100/100</span>
-        </div>
-    </div>
-
-    <div class="panel">
-        <h3>Верстак</h3>
-        <button class="action-btn" id="btn-craft-iron">Сделать Железо <span>10 камня</span></button>
-        <button class="action-btn" id="btn-craft-plank">Сделать Брусок <span>10 дерева</span></button>
-        <button class="action-btn" id="btn-craft-shovel">Собрать лопату <span>1ж + 1б</span></button>
-    </div>
-
-    <div class="panel">
-        <div class="olga-box">
-            <div class="olga-avatar">
-                <div style="width:50px; height:20px; background:#7f8c8d; border-radius:25px 25px 0 0; position:absolute; top:-5px; left:5px;"></div>
-                <div class="olga-glasses"><div class="lens"></div><div class="lens"></div></div>
-            </div>
-            <div>
-                <strong style="color:#f1c40f">Ольга Михайловна</strong>
-                <p style="font-size: 12px; color: #ccc;">Сдавай лопаты пачками по 100 штук!</p>
-            </div>
-        </div>
-        <button class="action-btn" id="btn-sell" style="background:#e67e22">Сдать 100 лопат <span>+4000 🪙</span></button>
-        <button class="action-btn" id="btn-upgrade" style="background:#9b59b6">Лимит +50 <span>2000 🪙</span></button>
-    </div>
-
     <div id="toast" class="toast"></div>
 
+    <div id="auth-screen" class="auth-container">
+        <div id="login-box" class="auth-card">
+            <div class="logo-container">
+                <div class="logo-box">⛏️</div>
+                <div class="logo-text">kirka</div>
+            </div>
+            <div class="beta-badge">BETA VERSION</div>
+            <input type="text" id="l-user" class="auth-input" placeholder="Логин">
+            <input type="password" id="l-pass" class="auth-input" placeholder="Пароль">
+            <button class="auth-btn" onclick="game.login()">ВОЙТИ</button>
+            <p style="margin-top:15px; font-size:12px; color:#64748b" onclick="game.toggleAuth(false)">Нет аккаунта? <u>Регистрация</u></p>
+        </div>
+
+        <div id="reg-box" class="auth-card" style="display: none;">
+            <div class="logo-text" style="font-size: 30px; margin-bottom: 20px;">Регистрация</div>
+            <input type="text" id="r-user" class="auth-input" placeholder="Придумайте логин">
+            <input type="password" id="r-pass" class="auth-input" placeholder="Пароль">
+            <button class="auth-btn" onclick="game.register()">СОЗДАТЬ</button>
+            <p style="margin-top:15px; font-size:12px; color:#64748b" onclick="game.toggleAuth(true)">Уже есть аккаунт? <u>Войти</u></p>
+        </div>
+    </div>
+
+    <div id="game-ui">
+        <header class="header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:30px; height:30px; background:var(--kirka-blue); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:18px;">⛏️</div>
+                <span id="display-name" style="font-weight: 800; letter-spacing: 1px;">USER</span>
+            </div>
+            <div class="balance">🪙 <span id="display-valute">0</span></div>
+        </header>
+
+        <main class="main-content">
+            <section id="p-stone" class="page active">
+                <div class="tap-zone tap-stone" onclick="game.tap('stone')">🪨</div>
+                <div style="text-align: center;">
+                    <p style="font-size: 20px;">Запас: <strong id="val-stone" style="color:var(--kirka-blue)">0</strong></p>
+                    <div class="progress-bar"><div id="bar-stone" class="progress-fill"></div></div>
+                    <p id="lim-stone" style="margin-top:8px; font-size:14px; color:#64748b">Лимит: 200/200</p>
+                    <p id="timer-stone" style="color: var(--kirka-blue); font-weight: bold; margin-top:5px; min-height:20px;"></p>
+                </div>
+            </section>
+
+            <section id="p-wood" class="page">
+                <div class="tap-zone tap-wood" onclick="game.tap('wood')">🪵</div>
+                <div style="text-align: center;">
+                    <p style="font-size: 20px;">Запас: <strong id="val-wood" style="color:#f59e0b">0</strong></p>
+                    <div class="progress-bar"><div id="bar-wood" class="progress-fill" style="background: #f59e0b;"></div></div>
+                    <p id="lim-wood" style="margin-top:8px; font-size:14px; color:#64748b">Лимит: 200/200</p>
+                    <p id="timer-wood" style="color: #f59e0b; font-weight: bold; margin-top:5px; min-height:20px;"></p>
+                </div>
+            </section>
+
+            <section id="p-olga" class="page">
+                <div class="profile-card" style="border-color: var(--gold);">
+                    <div style="font-size: 50px; margin-bottom: 10px;">👵</div>
+                    <h3>Ольга Михайловна</h3>
+                    <p style="color:#94a3b8; font-size:12px; margin-top:5px;">"Лопаты сами себя не сдадут!"</p>
+                </div>
+                <div style="display:flex; gap:10px; margin: 20px 0;">
+                    <div style="flex:1; background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; text-align:center;">
+                        <small>⚒️ Лопаты</small><br><b id="val-shovels" style="font-size:20px;">0</b>
+                    </div>
+                </div>
+                <button class="btn btn-blue" onclick="game.craft()">Собрать лопату (10 камня + 10 дерева)</button>
+                <button class="btn btn-gold" onclick="game.sell()">Сдать 100 лопат (+4000 🪙)</button>
+            </section>
+
+            <section id="p-profile" class="page">
+                <div class="profile-card">
+                    <div class="beta-badge">BETA PLAYER</div>
+                    <h2 id="prof-name">ИГРОК</h2>
+                    <p id="prof-date" style="font-size:12px; color:#64748b; margin-top:5px;"></p>
+                </div>
+                
+                <button class="btn btn-blue" style="margin-top:20px" onclick="game.upgrade()">Улучшить лимит (2000 🪙)</button>
+                <button class="btn" style="background:#ef4444; color:white;" onclick="game.logout()">Выйти</button>
+
+                <div class="footer-info">
+                    <p>Версия: <b>0.1.2-beta</b></p>
+                    <p>Создатель: <a href="#" class="creator-tag">@thilllan</a></p>
+                    <p style="font-size: 10px; margin-top: 10px;">© 2026 Kirka Game. All rights reserved.</p>
+                </div>
+            </section>
+        </main>
+
+        <nav class="nav">
+            <div class="nav-item active" onclick="game.nav('stone', this)"><span class="nav-icon">🪨</span>Камень</div>
+            <div class="nav-item" onclick="game.nav('wood', this)"><span class="nav-icon">🪵</span>Дерево</div>
+            <div class="nav-item" onclick="game.nav('olga', this)"><span class="nav-icon">👵</span>Ольга</div>
+            <div class="nav-item" onclick="game.nav('profile', this)"><span class="nav-icon">👤</span>Профиль</div>
+        </nav>
+    </div>
+
     <script>
-        // ВСЯ ЛОГИКА ТУТ
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Состояние
-            let state = JSON.parse(localStorage.getItem('craft_game_save')) || {
-                stone: 0, wood: 0, iron: 0, planks: 0, shovels: 0,
-                currency: 0, stoneLimit: 100, woodLimit: 100, maxLimit: 100,
-                lastReset: Date.now()
-            };
+        const game = {
+            user: null,
+            data: {},
 
-            // 2. Элементы UI
-            const els = {
-                stone: document.getElementById('ui-stone'),
-                wood: document.getElementById('ui-wood'),
-                iron: document.getElementById('ui-iron'),
-                planks: document.getElementById('ui-planks'),
-                shovels: document.getElementById('ui-shovels'),
-                currency: document.getElementById('ui-currency'),
-                limStone: document.getElementById('ui-limit-stone'),
-                limWood: document.getElementById('ui-limit-wood'),
-                barStone: document.getElementById('bar-stone'),
-                barWood: document.getElementById('bar-wood')
-            };
+            init() {
+                const session = localStorage.getItem('kirka_session');
+                if (session) {
+                    this.user = session;
+                    this.load();
+                    this.start();
+                }
+            },
 
-            // 3. Функции обновления
-            function save() {
-                localStorage.setItem('craft_game_save', JSON.stringify(state));
-                updateUI();
-            }
+            login() {
+                const u = document.getElementById('l-user').value.trim();
+                const p = document.getElementById('l-pass').value.trim();
+                const raw = localStorage.getItem(`kirka_u_${u}`);
+                if (!raw) return this.notify("Пользователь не найден");
+                const d = JSON.parse(raw);
+                if (d.pass !== p) return this.notify("Неверный пароль");
+                this.user = u;
+                localStorage.setItem('kirka_session', u);
+                this.load();
+                this.start();
+            },
 
-            function updateUI() {
-                els.stone.innerText = state.stone;
-                els.wood.innerText = state.wood;
-                els.iron.innerText = state.iron;
-                els.planks.innerText = state.planks;
-                els.shovels.innerText = state.shovels;
-                els.currency.innerText = state.currency;
-                
-                els.limStone.innerText = `${state.stoneLimit}/${state.maxLimit}`;
-                els.limWood.innerText = `${state.woodLimit}/${state.maxLimit}`;
-                
-                els.barStone.style.width = (state.stoneLimit / state.maxLimit * 100) + '%';
-                els.barWood.style.width = (state.woodLimit / state.maxLimit * 100) + '%';
+            register() {
+                const u = document.getElementById('r-user').value.trim();
+                const p = document.getElementById('r-pass').value.trim();
+                if (u.length < 3) return this.notify("Слишком короткий ник");
+                if (localStorage.getItem(`kirka_u_${u}`)) return this.notify("Ник занят");
+                const newData = {
+                    pass: p, stone: 0, wood: 0, shovels: 0, currency: 0,
+                    sLim: 200, wLim: 200, maxLim: 200, reset: 0, date: new Date().toLocaleDateString()
+                };
+                localStorage.setItem(`kirka_u_${u}`, JSON.stringify(newData));
+                this.notify("Аккаунт создан!");
+                this.toggleAuth(true);
+            },
 
-                // Блокировка кнопок
-                document.getElementById('btn-craft-iron').disabled = state.stone < 10;
-                document.getElementById('btn-craft-plank').disabled = state.wood < 10;
-                document.getElementById('btn-craft-shovel').disabled = (state.iron < 1 || state.planks < 1);
-                document.getElementById('btn-sell').disabled = state.shovels < 100;
-                document.getElementById('btn-upgrade').disabled = state.currency < 2000;
-            }
+            load() {
+                this.data = JSON.parse(localStorage.getItem(`kirka_u_${this.user}`));
+            },
 
-            function showToast(msg) {
+            save() {
+                localStorage.setItem(`kirka_u_${this.user}`, JSON.stringify(this.data));
+                this.updateUI();
+            },
+
+            start() {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('game-ui').style.display = 'flex';
+                document.getElementById('display-name').innerText = this.user.toUpperCase();
+                document.getElementById('prof-name').innerText = this.user.toUpperCase();
+                document.getElementById('prof-date').innerText = "Участник беты с " + this.data.date;
+                this.checkReset();
+                this.updateUI();
+                setInterval(() => this.tick(), 1000);
+            },
+
+            tap(type) {
+                const k = type === 'stone' ? 'sLim' : 'wLim';
+                if (this.data[k] > 0) {
+                    this.data[type]++;
+                    this.data[k]--;
+                    if (this.data[k] === 0) this.data.reset = Date.now();
+                    this.save();
+                } else this.notify("Лимит исчерпан!");
+            },
+
+            craft() {
+                if (this.data.stone >= 10 && this.data.wood >= 10) {
+                    this.data.stone -= 10; this.data.wood -= 10;
+                    this.data.shovels++;
+                    this.save();
+                } else this.notify("Нужно 10 камня и 10 дерева");
+            },
+
+            sell() {
+                if (this.data.shovels >= 100) {
+                    this.data.shovels -= 100;
+                    this.data.currency += 4000;
+                    this.save();
+                    this.notify("+4000 монет!");
+                } else this.notify("Нужно 100 лопат");
+            },
+
+            upgrade() {
+                if (this.data.currency >= 2000) {
+                    this.data.currency -= 2000;
+                    this.data.maxLim += 50;
+                    this.data.sLim += 50; this.data.wLim += 50;
+                    this.save();
+                    this.notify("Лимит расширен!");
+                } else this.notify("Недостаточно монет");
+            },
+
+            checkReset() {
+                if (this.data.reset && Date.now() - this.data.reset > 3600000) {
+                    this.data.sLim = this.data.maxLim;
+                    this.data.wLim = this.data.maxLim;
+                    this.data.reset = 0;
+                    this.save();
+                }
+            },
+
+            tick() {
+                this.checkReset();
+                if (this.data.reset) {
+                    const diff = 3600000 - (Date.now() - this.data.reset);
+                    const m = Math.floor(diff / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    const t = `КД: ${m}м ${s}с`;
+                    if (this.data.sLim === 0) document.getElementById('timer-stone').innerText = t;
+                    if (this.data.wLim === 0) document.getElementById('timer-wood').innerText = t;
+                } else {
+                    document.getElementById('timer-stone').innerText = "";
+                    document.getElementById('timer-wood').innerText = "";
+                }
+            },
+
+            nav(id, el) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.getElementById('p-' + id).classList.add('active');
+                el.classList.add('active');
+            },
+
+            updateUI() {
+                document.getElementById('display-valute').innerText = this.data.currency;
+                document.getElementById('val-stone').innerText = this.data.stone;
+                document.getElementById('val-wood').innerText = this.data.wood;
+                document.getElementById('val-shovels').innerText = this.data.shovels;
+                document.getElementById('lim-stone').innerText = `Лимит: ${this.data.sLim}/${this.data.maxLim}`;
+                document.getElementById('lim-wood').innerText = `Лимит: ${this.data.wLim}/${this.data.maxLim}`;
+                document.getElementById('bar-stone').style.width = (this.data.sLim / this.data.maxLim * 100) + '%';
+                document.getElementById('bar-wood').style.width = (this.data.wLim / this.data.maxLim * 100) + '%';
+            },
+
+            toggleAuth(isLogin) {
+                document.getElementById('login-box').style.display = isLogin ? 'block' : 'none';
+                document.getElementById('reg-box').style.display = isLogin ? 'none' : 'block';
+            },
+
+            logout() {
+                localStorage.removeItem('kirka_session');
+                location.reload();
+            },
+
+            notify(txt) {
                 const t = document.getElementById('toast');
-                t.innerText = msg;
-                t.style.display = 'block';
+                t.innerText = txt; t.style.display = 'block';
                 setTimeout(() => t.style.display = 'none', 2000);
             }
+        };
 
-            // 4. Обработчики событий (вместо onclick)
-            document.getElementById('btn-mine-stone').addEventListener('click', () => {
-                if (state.stoneLimit > 0) {
-                    state.stone++;
-                    state.stoneLimit--;
-                    save();
-                } else { showToast("Нет лимита!"); }
-            });
-
-            document.getElementById('btn-mine-wood').addEventListener('click', () => {
-                if (state.woodLimit > 0) {
-                    state.wood++;
-                    state.woodLimit--;
-                    save();
-                } else { showToast("Нет лимита!"); }
-            });
-
-            document.getElementById('btn-craft-iron').addEventListener('click', () => {
-                state.stone -= 10; state.iron++; save();
-            });
-
-            document.getElementById('btn-craft-plank').addEventListener('click', () => {
-                state.wood -= 10; state.planks++; save();
-            });
-
-            document.getElementById('btn-craft-shovel').addEventListener('click', () => {
-                state.iron--; state.planks--; state.shovels++; save();
-            });
-
-            document.getElementById('btn-sell').addEventListener('click', () => {
-                state.shovels -= 100; state.currency += 4000; 
-                showToast("Ольга Михайловна приняла товар!");
-                save();
-            });
-
-            document.getElementById('btn-upgrade').addEventListener('click', () => {
-                state.currency -= 2000; state.maxLimit += 50; 
-                state.stoneLimit += 50; state.woodLimit += 50;
-                save();
-            });
-
-            // Сброс лимита раз в час
-            setInterval(() => {
-                if (Date.now() - state.lastReset > 3600000) {
-                    state.stoneLimit = state.maxLimit;
-                    state.woodLimit = state.maxLimit;
-                    state.lastReset = Date.now();
-                    save();
-                }
-            }, 60000);
-
-            // Стартовый запуск
-            updateUI();
-        });
+        game.init();
     </script>
 </body>
 </html>
